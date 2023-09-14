@@ -3,8 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import altair as alt
-
-
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Import necessary libraries
@@ -13,10 +11,10 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 def load_data():
     # Define the file path
     file_path = 'https://raw.githubusercontent.com/Mbmbmbmbmbm/titanic/main/wine_market.csv'
-
+    
     # Load the CSV file into a pandas dataframe
     df = pd.read_csv(file_path)
-
+    
     # Cleaning data
     df = df[df['Marital_Status'] != 'Absurd']
     df = df[df['Marital_Status'] != 'YOLO']
@@ -28,7 +26,7 @@ def load_data():
     df=df.drop(192)
     df=df.drop(239)
     df=df.drop(339)
-
+    
     # Create age groups and add as a new column
     df['Age'] = 2023 - df['Year_Birth']
     bin_edges = [27, 40, 50, 60, 90]
@@ -47,11 +45,15 @@ st.sidebar.header("Filters 📊")
 
 # HR Attrition Dashboard
 
-st.markdown(""" We could arrange it so that one part of the chosen filters show the filtered customers' spending habits. Another filter type could be reversed, so the the spending habits are used as filters instead""")
+st.markdown(""" Welcome to the Wine market Dashboard🍷. Due to the everchanging financial environment of today it is necessary for businesses to have a significant understanding of their target audience to better market their products and allocate time and money into development of under supplied user-segments. The following Wine Market dashboard includes a filter option where it is possible to create a specific segment from 6 different parameters and thereafter see the visualized data for the specific group.""")
 
-with st.expander("📊 **Title on expander**"):
-                 st.markdown("""This is a cool expander""")
+with st.expander("**How to use the dashboard**"):
+                 st.markdown("""Sidebar Usage: The sidebar on the left allows you to filter customers by their characteristics. You can select specific attributes to focus on and adjust filters to explore the data.
 
+Dashboard Output: The dashboard provides descriptive statistics of customer spending habits, helping you gain insights into their behaviors and preferences.
+
+""")
+                             
 
 # Sidebar filter: Age Group
 selected_age_group = st.sidebar.multiselect("Select Age Groups 🕰️", df['AgeGroup'].unique().tolist(), default=df['AgeGroup'].unique().tolist())
@@ -70,25 +72,23 @@ filtered_df = filtered_df[filtered_df['Education'].isin(selected_Education)]
 
 # Sidebar filter: Marital Status
 Marital_Status = df['Marital_Status'].unique().tolist()
-selected_Marital_Status = st.sidebar.multiselect("Select Marital Status 🏢", Marital_Status, default=Marital_Status)
+selected_Marital_Status = st.sidebar.multiselect("Select Marital Status💍", Marital_Status, default=Marital_Status)
 if not selected_Marital_Status:
     st.warning("Please select a Marital Status from the sidebar ⚠️")
     st.stop()
 filtered_df = filtered_df[filtered_df['Marital_Status'].isin(selected_Marital_Status)]
 
 #Sidebar filter: complaint
-#Create a mapping from string to original values
+# Create a mapping from string to original values 
 complain_mapping = {'Yes': 1, 'No': 0}
-
-#Get the unique values and create a list of strings for the sidebar
+# Get the unique values and create a list of strings for the sidebar
 Complain = ['Yes' if x == 1 else 'No' for x in df['Complain'].unique().tolist()]
 
-selected_Complainer = st.sidebar.multiselect("Has customer complained?", Complain, default=Complain)
+selected_Complainer = st.sidebar.multiselect("Has customer complained?😠", Complain, default=Complain)
 if not selected_Complainer:
     st.warning("Please select a complaint status from the sidebar ⚠️")
     st.stop()
-
-#Map the selected values back to the original values for filtering
+# Map the selected values back to the original values for filtering
 selected_Complainer_mapped = [complain_mapping[val] for val in selected_Complainer]
 
 filtered_df = filtered_df[filtered_df['Complain'].isin(selected_Complainer_mapped)]
@@ -102,6 +102,8 @@ filtered_df = filtered_df[(filtered_df['Income'] >= income_range[0]) & (filtered
 # Sidebar filter:  Recency
 min_recent = df['Recency'].min()
 max_recent = df['Recency'].max()
+min_recent = int(min_recent)
+max_recent = int(max_recent)
 recent_range = st.sidebar.slider("Select days since Last Purchase", min_recent, max_recent, (min_recent, max_recent))
 filtered_df = filtered_df[(filtered_df['Recency'] >= recent_range[0]) & (filtered_df['Recency'] <= recent_range[1])]
 
@@ -111,23 +113,11 @@ st.header("Customer Analysis 📊")
 
 # Dropdown to select the type of visualization
 visualization_option = st.selectbox(
-    'Select Visualization 🎨',
-    ['Product Spending by Age Group', 'Campaign Acceptence', 'Spending by Product Type', 'Channel Overview' ]
+    'Select Visualization 🎨', 
+    [ 'Campaign Acceptence', 'Spending by Product Type', 'Channel Overview' ]
 )
 
-# Visualizations based on user selection
-if visualization_option == 'Product Spending by Age Group':
-
-    chart = alt.Chart(filtered_df).mark_bar().encode(
-        x='AgeGroup',
-        y='count()',
-        color='MntWines'
-    ).properties(
-        title='Spendings on Wine'
-    )
-    st.altair_chart(chart, use_container_width=True)
-
-elif visualization_option == 'Campaign Acceptence':
+if visualization_option == 'Campaign Acceptence':
     @st.cache_data  # Cache the function to enhance performance
     def load_camp_data():
         df_camp = ['ID', 'AcceptedCmp1', 'AcceptedCmp2', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5', 'Response']
@@ -156,6 +146,7 @@ elif visualization_option == 'Campaign Acceptence':
     plt.xlabel('Campaign')
     plt.title('Acceptance Rates of Each Marketing Campaign')
     st.pyplot()
+    st.markdown("The above graph visualizes the total amount spent on different goods in the last 2 years. The goods are spread out across the product groups: fish, fruits, gold, meat, sweets and wine")
 
 
 
@@ -177,7 +168,7 @@ elif visualization_option == 'Spending by Product Type':
 
     # Filter 'df_camp' based on the IDs in 'filtered_df'
     df_amount = df_amount[df_amount['ID'].isin(filtered_ids)]
-
+    
     df_amount['Product_Type'] = df_amount['Product_Type'].replace({'MntWines': 'Wine','MntFruits': 'Fruits','MntMeatProducts': 'Meat','MntFishProducts': 'Fish','MntSweetProducts': 'Sweets','MntGoldProds': 'Gold'})
 
     df_sum = df_amount.groupby('Product_Type')['Amount'].sum().reset_index()
@@ -188,7 +179,12 @@ elif visualization_option == 'Spending by Product Type':
     plt.xlabel('Product Type')
     plt.title('Total Amount Bought of Each Product Type')
     st.pyplot()
-
+    st.markdown("The above graph visualizes the acceptance rate for if the customer has accepted an offer in a specific campaign.  The value in the x-axis illustrates the number of the specific campaign sent to them and the y-axis illustrates the acceptance rate of the specific campaign")
+    
+    selected_columns_1 = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
+    df_des2 = filtered_df[selected_columns_1].describe().T
+    df_des2
+    
 elif visualization_option == 'Channel Overview':
     # Melt the dataframe to have channels as a single column
     df_melted = df.melt(id_vars='MntWines', value_vars=['NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases'],
@@ -216,3 +212,9 @@ elif visualization_option == 'Channel Overview':
 
     plt.tight_layout()
     st.pyplot()
+    st.markdown("The above graph visualizes the place of the specific purchases. The value in the x-axis illustrates the place of the purchases and the y-axis illustrates the amount bought at the location. ")
+
+    selected_columns = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
+    df_des1 = filtered_df[selected_columns].describe().T
+    df_des1
+
