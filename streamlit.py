@@ -146,7 +146,7 @@ if visualization_option == 'Campaign Acceptence':
     plt.xlabel('Campaign')
     plt.title('Acceptance Rates of Each Marketing Campaign')
     st.pyplot()
-    st.markdown("The above graph visualizes the total amount spent on different goods in the last 2 years. The goods are spread out across the product groups: fish, fruits, gold, meat, sweets and wine")
+    st.markdown("The above graph visualizes the acceptance rate for if the customer has accepted an offer in a specific campaign.  The value in the x-axis illustrates the number of the specific campaign sent to them and the y-axis illustrates the acceptance rate of the specific campaign")
 
 
 
@@ -179,7 +179,7 @@ elif visualization_option == 'Spending by Product Type':
     plt.xlabel('Product Type')
     plt.title('Total Amount Bought of Each Product Type')
     st.pyplot()
-    st.markdown("The above graph visualizes the acceptance rate for if the customer has accepted an offer in a specific campaign.  The value in the x-axis illustrates the number of the specific campaign sent to them and the y-axis illustrates the acceptance rate of the specific campaign")
+    st.markdown("The above graph visualizes the total amount spent on different goods in the last 2 years. The goods are spread out across the product groups: fish, fruits, gold, meat, sweets and wine")
     
     selected_columns_1 = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
     df_des2 = filtered_df[selected_columns_1].describe().T
